@@ -1,64 +1,81 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SENAI GPT</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SENAI GPT</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-<link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<button class="toggle-theme" id="toggleTheme">
-    <i class="fa-solid fa-moon"></i>
-</button>
+    <button class="toggle-theme" id="toggleTheme">
+        <i class="fa-solid fa-moon"></i>
+    </button>
 
-<div class="barra-lateral"></div>
+    <div class="barra-lateral"></div>
 
-<main class="container">
+    <main class="container">
 
-    <div class="icone-robo">
-        <i class="fa-solid fa-robot"></i>
-    </div>
-
-    <h1>SENAI-GPT</h1>
-
-    <!-- formulário -->
-    <form id="chatForm">
-
-        <div class="busca-area">
-            <input
-                type="text"
-                id="pergunta"
-                placeholder="Digite sua pergunta..."
-                required
-            >
-
-            <!-- botão submit -->
-            <button type="submit" class="send-btn">
-                <i class="fa-solid fa-paper-plane"></i>
-            </button>
-            <button type="button" class="mic-btn">
-                <i class="fa-solid fa-microphone"></i>
-            </button>
+        <div class="icone-robo">
+            <i class="fa-solid fa-robot"></i>
         </div>
 
-        <button class="btn-senai">SENAI</button>
+        <h1>SENAI-GPT</h1>
 
-    </form>
+        <!-- formulário -->
+        <form id="chatForm">
 
-    <!-- resposta -->
-    <section class="resposta-box" id="respostaBox">
-        <h2>Resposta:</h2>
-        <p id="respostaTexto"></p>
-    </section>
+            <div class="busca-area">
 
-</main>
+                <!-- campo pergunta -->
+                <input type="text" id="pergunta" name="pergunta" placeholder="Digite sua pergunta..." autocomplete="off"
+                    required>
 
-<script src="script.js"></script>
+                <!-- botão enviar -->
+                <button type="submit" class="send-btn" title="Enviar pergunta">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+
+                <!-- botão microfone -->
+                <button type="button" class="mic-btn" id="btnMic" title="Falar pergunta">
+                    <i class="fa-solid fa-microphone"></i>
+                </button>
+
+            </div>
+
+            <!-- botão principal -->
+            <img src="senai.jpg" alt="SENAI" class="logo-senai">
+
+
+
+        </form>
+
+        <!-- área de resposta -->
+        <section class="resposta-box">
+
+            <h2>Resposta</h2>
+
+            <!-- loading -->
+            <div id="loading" style="display:none;">
+                Consultando Azure AI...
+            </div>
+
+            <!-- resposta -->
+            <div id="respostaTexto">
+            </div>
+
+        </section>
+
+        <!-- chama javascript -->
+        <script src="script.js"></script>
+    </main>
+
 </body>
+
 </html>
