@@ -1,4 +1,1 @@
-# Ambiente / segredos
-.env
-.env.*
-!.env.example
+keys.json
