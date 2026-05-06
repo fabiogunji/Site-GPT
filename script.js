@@ -52,7 +52,7 @@ const apiSwitch = document.getElementById("apiSwitch");
    PROVIDER (TOGGLE)
 ========================== */
 function getProvider() {
-    return apiSwitch.checked ? "gemini" : "azure";
+    return apiSwitch.checked ? "GEMINI" : "CHATGPT";
 }
 
 
@@ -92,7 +92,7 @@ function extrairGemini(data) {
     try {
         return data.candidates[0].content.parts[0].text;
     } catch {
-        return "Resposta não encontrada (Gemini).";
+        return "Resposta não encontrada (GEMINI).";
     }
 }
 
@@ -118,7 +118,7 @@ form.addEventListener("submit", async function (e) {
     loading.innerHTML =
         provider === "gemini"
             ? "🔴 Consultando Gemini..."
-            : "🔵 Consultando Azure...";
+            : "🔵 Consultando ChatGPT...";
 
     respostaTexto.innerHTML = "";
 
@@ -132,7 +132,7 @@ form.addEventListener("submit", async function (e) {
         /* ======================
            AZURE
         ====================== */
-        if (provider === "azure") {
+        if (provider === "CHATGPT") {
 
             response = await fetch(keys.AZURE_ENDPOINT, {
                 method: "POST",
@@ -148,7 +148,7 @@ form.addEventListener("submit", async function (e) {
 
             data = await response.json();
 
-            console.log("RETORNO AZURE:", data);
+            console.log("RETORNO CHATGPT:", data);
 
             textoFinal = extrairAzure(data);
         }

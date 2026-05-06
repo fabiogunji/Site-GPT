@@ -40,7 +40,7 @@ app.post("/perguntar", async (req, res) => {
 
     } catch (error) {
         res.status(500).json({
-            resposta: "Erro ao consultar Azure."
+            resposta: "Erro ao consultar ChatGPT."
         });
         resposta: "Consultar Gemini."
     }
