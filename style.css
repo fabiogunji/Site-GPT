@@ -226,3 +226,14 @@ input:checked + .slider{
 input:checked + .slider:before{
     transform:translateX(30px);
 }
+
+.mic-btn.listening{
+    background:#ff4d4d;
+    animation:pulse 1s infinite;
+}
+
+@keyframes pulse{
+    0%{transform:scale(1);}
+    50%{transform:scale(1.1);}
+    100%{transform:scale(1);}
+}

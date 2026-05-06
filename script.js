@@ -203,3 +203,62 @@ form.addEventListener("submit", async function (e) {
     loading.style.display = "none";
 
 });
+
+/* ==========================
+   MICROFONE (VOICE INPUT)
+========================== */
+
+const micBtn = document.getElementById("micBtn");
+const campoPergunta = document.getElementById("pergunta");
+
+/* compatibilidade */
+const SpeechRecognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
+
+if(!SpeechRecognition){
+    console.warn("Reconhecimento de voz não suportado.");
+}else{
+
+    const recognition = new SpeechRecognition();
+
+    recognition.lang = "pt-BR";   // português
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    /* clique no microfone */
+    micBtn.addEventListener("click", () => {
+
+        recognition.start();
+
+        micBtn.classList.add("listening");
+        console.log("🎤 Ouvindo...");
+
+    });
+
+    /* quando capturar */
+    recognition.onresult = (event) => {
+
+        const texto =
+            event.results[0][0].transcript;
+
+        campoPergunta.value = texto;
+
+        console.log("Você disse:", texto);
+    };
+
+    /* erro */
+    recognition.onerror = (event) => {
+
+        console.error("Erro voz:", event.error);
+
+        alert("Erro no microfone: " + event.error);
+    };
+
+    /* quando parar */
+    recognition.onend = () => {
+
+        micBtn.classList.remove("listening");
+        console.log("🛑 Parou de ouvir");
+    };
+}
