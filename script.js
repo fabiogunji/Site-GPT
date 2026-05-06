@@ -134,7 +134,7 @@ form.addEventListener("submit", async function (e) {
         ====================== */
         if(provider === "azure"){
 
-            response = await fetch(keys.ENDPOINT_AZURE, {
+            response = await fetch(keys.AZURE_ENDPOINT, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
