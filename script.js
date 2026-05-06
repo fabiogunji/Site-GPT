@@ -134,7 +134,7 @@ form.addEventListener("submit", async function (e) {
         ====================== */
         if(provider === "azure"){
 
-            response = await fetch(keys.ENDPOINT, {
+            response = await fetch(keys.ENDPOINT_AZURE, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -158,8 +158,8 @@ form.addEventListener("submit", async function (e) {
         ====================== */
         else{
 
-            response = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${keys.GOOGLE_API_KEY}`,
+            response = await fetch(                
+                `${keys.ENDPOINT_GOOGLE}?key=${keys.GOOGLE_API_KEY}`,
                 {
                     method:"POST",
                     headers:{
