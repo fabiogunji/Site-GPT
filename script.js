@@ -192,6 +192,9 @@ form.addEventListener("submit", async function (e) {
             <div>${textoFinal}</div>
         `;
 
+        /* 🔊 fala resposta */
+        falarTexto(textoFinal);
+
     } catch (erro) {
 
         console.error(erro);
@@ -261,4 +264,66 @@ if(!SpeechRecognition){
         micBtn.classList.remove("listening");
         console.log("🛑 Parou de ouvir");
     };
+}
+
+const vozes = window.speechSynthesis.getVoices();
+
+const vozBR = vozes.find(
+    voz => voz.lang === "pt-BR"
+);
+
+if(vozBR){
+    fala.voice = vozBR;
+}
+
+/* ==========================
+   TEXT TO SPEECH
+========================== */
+/* ==========================
+   TEXT TO SPEECH FEMININO
+========================== */
+function falarTexto(texto){
+
+    /* para fala anterior */
+    window.speechSynthesis.cancel();
+
+    const fala = new SpeechSynthesisUtterance(texto);
+
+    fala.lang = "pt-BR";
+
+    /* configuração voz */
+    fala.rate = 0.95;
+    fala.pitch = 1.15;
+    fala.volume = 1;
+
+    /* lista vozes */
+    const vozes = window.speechSynthesis.getVoices();
+
+    console.log(vozes);
+
+    /* tenta localizar voz feminina PT-BR */
+    let vozFeminina = vozes.find(voz =>
+        voz.lang.includes("pt") &&
+        (
+            voz.name.includes("Maria") ||
+            voz.name.includes("Female") ||
+            voz.name.includes("Luciana") ||
+            voz.name.includes("Google português do Brasil")
+        )
+    );
+
+    /* fallback */
+    if(!vozFeminina){
+        vozFeminina = vozes.find(
+            voz => voz.lang.includes("pt")
+        );
+    }
+
+    /* aplica voz */
+    if(vozFeminina){
+        fala.voice = vozFeminina;
+    }
+
+    /* fala */
+    window.speechSynthesis.speak(fala);
 }
