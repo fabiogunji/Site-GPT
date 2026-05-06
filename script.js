@@ -51,7 +51,7 @@ const apiSwitch = document.getElementById("apiSwitch");
 /* ==========================
    PROVIDER (TOGGLE)
 ========================== */
-function getProvider(){
+function getProvider() {
     return apiSwitch.checked ? "gemini" : "azure";
 }
 
@@ -59,7 +59,7 @@ function getProvider(){
 /* ==========================
    EXTRATOR AZURE
 ========================== */
-function extrairAzure(data){
+function extrairAzure(data) {
 
     let texto = "";
 
@@ -75,7 +75,7 @@ function extrairAzure(data){
                 item => item.type === "output_text"
             );
 
-            if (conteudo){
+            if (conteudo) {
                 texto = conteudo.text;
             }
         }
@@ -88,10 +88,10 @@ function extrairAzure(data){
 /* ==========================
    EXTRATOR GEMINI
 ========================== */
-function extrairGemini(data){
-    try{
+function extrairGemini(data) {
+    try {
         return data.candidates[0].content.parts[0].text;
-    }catch{
+    } catch {
         return "Resposta não encontrada (Gemini).";
     }
 }
@@ -117,8 +117,8 @@ form.addEventListener("submit", async function (e) {
     loading.style.display = "block";
     loading.innerHTML =
         provider === "gemini"
-        ? "🔴 Consultando Gemini..."
-        : "🔵 Consultando Azure...";
+            ? "🔴 Consultando Gemini..."
+            : "🔵 Consultando Azure...";
 
     respostaTexto.innerHTML = "";
 
@@ -132,7 +132,7 @@ form.addEventListener("submit", async function (e) {
         /* ======================
            AZURE
         ====================== */
-        if(provider === "azure"){
+        if (provider === "azure") {
 
             response = await fetch(keys.AZURE_ENDPOINT, {
                 method: "POST",
@@ -156,19 +156,19 @@ form.addEventListener("submit", async function (e) {
         /* ======================
            GEMINI
         ====================== */
-        else{
+        else {
 
-            response = await fetch(                
+            response = await fetch(
                 `${keys.ENDPOINT_GOOGLE}?key=${keys.GOOGLE_API_KEY}`,
                 {
-                    method:"POST",
-                    headers:{
-                        "Content-Type":"application/json"
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        contents:[
+                        contents: [
                             {
-                                parts:[
+                                parts: [
                                     { text: pergunta }
                                 ]
                             }
@@ -219,9 +219,9 @@ const SpeechRecognition =
     window.SpeechRecognition ||
     window.webkitSpeechRecognition;
 
-if(!SpeechRecognition){
+if (!SpeechRecognition) {
     console.warn("Reconhecimento de voz não suportado.");
-}else{
+} else {
 
     const recognition = new SpeechRecognition();
 
@@ -272,17 +272,14 @@ const vozBR = vozes.find(
     voz => voz.lang === "pt-BR"
 );
 
-if(vozBR){
+if (vozBR) {
     fala.voice = vozBR;
 }
 
 /* ==========================
    TEXT TO SPEECH
 ========================== */
-/* ==========================
-   TEXT TO SPEECH FEMININO
-========================== */
-function falarTexto(texto){
+function falarTexto(texto) {
 
     /* para fala anterior */
     window.speechSynthesis.cancel();
@@ -313,14 +310,14 @@ function falarTexto(texto){
     );
 
     /* fallback */
-    if(!vozFeminina){
+    if (!vozFeminina) {
         vozFeminina = vozes.find(
             voz => voz.lang.includes("pt")
         );
     }
 
     /* aplica voz */
-    if(vozFeminina){
+    if (vozFeminina) {
         fala.voice = vozFeminina;
     }
 
