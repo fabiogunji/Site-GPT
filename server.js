@@ -23,7 +23,7 @@ app.post("/perguntar", async (req, res) => {
                 },
                 body: JSON.stringify({
                     messages: [
-                        { role: "system", content: "Você é o SENAI-GPT." },
+                        { role: "system", content: "Você é o SITE-GPT." },
                         { role: "user", content: pergunta }
                     ],
                     temperature: 0.7,
@@ -45,6 +45,3 @@ app.post("/perguntar", async (req, res) => {
     }
 });
 
-app.listen(3000, () => {
-    console.log("Servidor em http://localhost:3000");
-});

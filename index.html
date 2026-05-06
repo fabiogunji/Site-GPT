@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SENAI GPT</title>
+    <title>SITE GPT</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -26,7 +26,7 @@
             <i class="fa-solid fa-robot"></i>
         </div>
 
-        <h1>SENAI-GPT</h1>
+        <h1>SITE-GPT</h1>
 
         <!-- formulário -->
         <form id="chatForm">
@@ -48,13 +48,23 @@
                 </button>
 
             </div>
+            <div class="api-toggle">
+                <span class="label">Azure</span>
 
-            <!-- botão principal -->
-            <img src="senai.jpg" alt="SENAI" class="logo-senai">
+                <label class="switch">
+                    <input type="checkbox" id="apiSwitch">
+                    <span class="slider"></span>
+                </label>
 
+                <span class="label">Gemini</span>
+            </div>
 
+           <div id="loading" style="display:none; font-weight:bold; margin-bottom:10px;">                
+            </div>
 
         </form>
+
+    
 
         <!-- área de resposta -->
         <section class="resposta-box">
@@ -65,7 +75,8 @@
             <div id="loading" style="display:none;">
                 Consultando Azure AI...
             </div>
-
+            
+            
             <!-- resposta -->
             <div id="respostaTexto">
             </div>
