@@ -42,6 +42,7 @@ app.post("/perguntar", async (req, res) => {
         res.status(500).json({
             resposta: "Erro ao consultar Azure."
         });
+            resposta: "Consultar Gemini."
     }
 });
 

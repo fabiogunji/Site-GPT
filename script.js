@@ -20,6 +20,7 @@ toggle.addEventListener("click", () => {
 
 });
 
+
 /* ==========================
    CARREGA CHAVE
 ========================== */
@@ -44,107 +45,159 @@ carregarKeys();
 const form = document.getElementById("chatForm");
 const respostaTexto = document.getElementById("respostaTexto");
 const loading = document.getElementById("loading");
+const apiSwitch = document.getElementById("apiSwitch");
 
 
 /* ==========================
-   TESTE AZURE
+   PROVIDER (TOGGLE)
+========================== */
+function getProvider(){
+    return apiSwitch.checked ? "gemini" : "azure";
+}
+
+
+/* ==========================
+   EXTRATOR AZURE
+========================== */
+function extrairAzure(data){
+
+    let texto = "";
+
+    if (data.output && Array.isArray(data.output)) {
+
+        const mensagem = data.output.find(
+            item => item.type === "message"
+        );
+
+        if (mensagem && mensagem.content) {
+
+            const conteudo = mensagem.content.find(
+                item => item.type === "output_text"
+            );
+
+            if (conteudo){
+                texto = conteudo.text;
+            }
+        }
+    }
+
+    return texto || "Resposta não encontrada.";
+}
+
+
+/* ==========================
+   EXTRATOR GEMINI
+========================== */
+function extrairGemini(data){
+    try{
+        return data.candidates[0].content.parts[0].text;
+    }catch{
+        return "Resposta não encontrada (Gemini).";
+    }
+}
+
+
+/* ==========================
+   ENVIO PRINCIPAL
 ========================== */
 form.addEventListener("submit", async function (e) {
 
     e.preventDefault();
 
-    const pergunta =
-        document.getElementById("pergunta").value.trim();
+    const pergunta = document.getElementById("pergunta").value.trim();
 
     if (pergunta === "") {
-        respostaTexto.innerHTML =
-            "Digite uma pergunta.";
+        respostaTexto.innerHTML = "Digite uma pergunta.";
         return;
     }
 
+    const provider = getProvider();
+
+    /* LOADING DINÂMICO */
     loading.style.display = "block";
-    respostaTexto.innerHTML =
-        "Conectando Azure...";
+    loading.innerHTML =
+        provider === "gemini"
+        ? "🔴 Consultando Gemini..."
+        : "🔵 Consultando Azure...";
+
+    respostaTexto.innerHTML = "";
+
+    /* força render do loading */
+    await new Promise(r => setTimeout(r, 50));
 
     try {
 
-        const response = await fetch(keys.ENDPOINT            ,
-            {
-                method: "POST",
+        let response, data, textoFinal;
 
+        /* ======================
+           AZURE
+        ====================== */
+        if(provider === "azure"){
+
+            response = await fetch(keys.ENDPOINT, {
+                method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "api-key": keys.AZURE_API_KEY
                 },
-
                 body: JSON.stringify({
                     model: "gpt-5.2-chat",
                     input: pergunta
                 })
-            }
-        );
+            });
 
-        /* status http */
-        console.log("HTTP STATUS:", response.status);
+            data = await response.json();
 
-        const data = await response.json();
+            console.log("RETORNO AZURE:", data);
 
-        console.log("RETORNO AZURE:", data);
-
-        /* se sucesso */
-        if (response.ok) {
-
-            /*respostaTexto.innerHTML = "✅ Conectado com sucesso!<br><br>" + data.output[0].content[0].text;*/
-            /* EXIBE SOMENTE O TEXTO DA RESPOSTA */
-
-            let texto = "";
-
-            if (
-                data.output &&
-                Array.isArray(data.output)
-            ) {
-
-                const mensagem = data.output.find(
-                    item => item.type === "message"
-                );
-
-                if (
-                    mensagem &&
-                    mensagem.content &&
-                    mensagem.content.length > 0
-                ) {
-
-                    const conteudo = mensagem.content.find(
-                        item => item.type === "output_text"
-                    );
-
-                    if (conteudo) {
-                        texto = conteudo.text;
-                    }
-                }
-            }
-
-            /* fallback */
-            if (texto === "") {
-                texto = "Resposta não encontrada.";
-            }
-
-            respostaTexto.innerHTML = texto;
-
-        } else {
-
-            respostaTexto.innerHTML =
-                "❌ Erro Azure:<br><br>" +
-                JSON.stringify(data, null, 2);
+            textoFinal = extrairAzure(data);
         }
+
+        /* ======================
+           GEMINI
+        ====================== */
+        else{
+
+            response = await fetch(
+                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${keys.GOOGLE_API_KEY}`,
+                {
+                    method:"POST",
+                    headers:{
+                        "Content-Type":"application/json"
+                    },
+                    body: JSON.stringify({
+                        contents:[
+                            {
+                                parts:[
+                                    { text: pergunta }
+                                ]
+                            }
+                        ]
+                    })
+                }
+            );
+
+            data = await response.json();
+
+            console.log("RETORNO GEMINI:", data);
+
+            textoFinal = extrairGemini(data);
+        }
+
+        /* EXIBE RESULTADO + PROVIDER */
+        respostaTexto.innerHTML = `
+            <div style="font-size:12px;color:#888;margin-bottom:5px;">
+                🔎 Fonte: ${provider.toUpperCase()}
+            </div>
+            <div>${textoFinal}</div>
+        `;
 
     } catch (erro) {
 
         console.error(erro);
 
         respostaTexto.innerHTML =
-            "❌ Falha de conexão:<br><br>" +
-            erro.message;
+            "❌ Erro de conexão:<br><br>" + erro.message;
     }
 
     loading.style.display = "none";
