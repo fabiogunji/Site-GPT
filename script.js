@@ -116,7 +116,7 @@ form.addEventListener("submit", async function (e) {
     /* LOADING DINÂMICO */
     loading.style.display = "block";
     loading.innerHTML =
-        provider === "gemini"
+        provider === "GEMINI"
             ? "🔴 Consultando Gemini..."
             : "🔵 Consultando ChatGPT...";
 
@@ -276,51 +276,56 @@ if (vozBR) {
     fala.voice = vozBR;
 }
 
+
 /* ==========================
-   TEXT TO SPEECH
+   TTS AZURE
 ========================== */
-function falarTexto(texto) {
+async function falarTexto(texto){
 
-    /* para fala anterior */
-    window.speechSynthesis.cancel();
+    try{
 
-    const fala = new SpeechSynthesisUtterance(texto);
+        const endpoint =
+            `https://${keys.AZURE_SPEECH_REGION}.tts.speech.microsoft.com/cognitiveservices/v1`;
 
-    fala.lang = "pt-BR";
+        const response = await fetch(endpoint, {
 
-    /* configuração voz */
-    fala.rate = 0.95;
-    fala.pitch = 1.15;
-    fala.volume = 1;
+            method:"POST",
 
-    /* lista vozes */
-    const vozes = window.speechSynthesis.getVoices();
+            headers:{
+                "Ocp-Apim-Subscription-Key":
+                    keys.AZURE_SPEECH_KEY,
 
-    console.log(vozes);
+                "Content-Type":
+                    "application/ssml+xml",
 
-    /* tenta localizar voz feminina PT-BR */
-    let vozFeminina = vozes.find(voz =>
-        voz.lang.includes("pt") &&
-        (
-            voz.name.includes("Maria") ||
-            voz.name.includes("Female") ||
-            voz.name.includes("Luciana") ||
-            voz.name.includes("Google português do Brasil")
-        )
-    );
+                "X-Microsoft-OutputFormat":
+                    "audio-16khz-128kbitrate-mono-mp3"
+            },
 
-    /* fallback */
-    if (!vozFeminina) {
-        vozFeminina = vozes.find(
-            voz => voz.lang.includes("pt")
-        );
+            body: `
+                <speak version='1.0' xml:lang='pt-BR'>
+                    <voice xml:lang='pt-BR'
+                           xml:gender='Female'
+                           name='pt-BR-FranciscaNeural'>
+
+                        ${texto}
+
+                    </voice>
+                </speak>
+            `
+        });
+
+        const audioBlob = await response.blob();
+
+        const audioUrl =
+            URL.createObjectURL(audioBlob);
+
+        const audio = new Audio(audioUrl);
+
+        audio.play();
+
+    }catch(erro){
+
+        console.error("Erro TTS Azure:", erro);
     }
-
-    /* aplica voz */
-    if (vozFeminina) {
-        fala.voice = vozFeminina;
-    }
-
-    /* fala */
-    window.speechSynthesis.speak(fala);
 }
