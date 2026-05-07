@@ -193,7 +193,7 @@ form.addEventListener("submit", async function (e) {
         `;
 
         /* 🔊 fala resposta */
-        falarTexto(textoFinal);
+        falarTexto( limparMarkdown(textoFinal));
 
     } catch (erro) {
 
@@ -203,6 +203,7 @@ form.addEventListener("submit", async function (e) {
             "❌ Erro de conexão:<br><br>" + erro.message;
     }
 
+    liberarInterface();
     loading.style.display = "none";
 
 });
@@ -212,6 +213,7 @@ form.addEventListener("submit", async function (e) {
 ========================== */
 
 const micBtn = document.getElementById("micBtn");
+const sendBtn = document.getElementById("sendBtn");
 const campoPergunta = document.getElementById("pergunta");
 
 /* compatibilidade */
@@ -280,9 +282,62 @@ if (vozBR) {
 /* ==========================
    TTS AZURE
 ========================== */
+
+/* ==========================
+   REMOVE MARKDOWN
+========================== */
+function limparMarkdown(texto){
+
+    if(!texto) return "";
+
+    return texto
+
+        /* remove blocos código ``` */
+        .replace(/```[\s\S]*?```/g, "")
+
+        /* remove inline code `code` */
+        .replace(/`([^`]+)`/g, "$1")
+
+        /* remove negrito **texto** */
+        .replace(/\*\*(.*?)\*\*/g, "$1")
+
+        /* remove itálico *texto* */
+        .replace(/\*(.*?)\*/g, "$1")
+
+        /* remove underline */
+        .replace(/__(.*?)__/g, "$1")
+
+        /* remove headings */
+        .replace(/^#+\s/gm, "")
+
+        /* remove listas */
+        .replace(/^\s*[-•]\s+/gm, "")
+
+        /* remove markdown links */
+        .replace(/\[([^\]]+)\]\((.*?)\)/g, "$1")
+
+        /* remove imagens markdown */
+        .replace(/!\[.*?\]\(.*?\)/g, "")
+
+        /* remove pipes tabela */
+        .replace(/\|/g, " ")
+
+        /* remove > quote */
+        .replace(/^>\s+/gm, "")
+
+        /* remove múltiplos espaços */
+        .replace(/\s+/g, " ")
+
+        .trim();
+}
+
 async function falarTexto(texto){
 
     try{
+
+         /* limpa markdown */
+        const textoLimpo = limparMarkdown(texto);
+        
 
         const endpoint =
             `https://${keys.AZURE_SPEECH_REGION}.tts.speech.microsoft.com/cognitiveservices/v1`;
@@ -328,4 +383,112 @@ async function falarTexto(texto){
 
         console.error("Erro TTS Azure:", erro);
     }
+}
+
+/* ==========================
+   BLOQUEIA INTERFACE
+========================== */
+function bloquearInterface(){
+
+    sendBtn.disabled = true;
+    micBtn.disabled = true;
+
+    sendBtn.style.opacity = "0.5";
+    micBtn.style.opacity = "0.5";
+
+    campoPergunta.disabled = true;
+}
+
+/* ==========================
+   LIBERA INTERFACE
+========================== */
+function liberarInterface(){
+
+    sendBtn.disabled = false;
+    micBtn.disabled = false;
+
+    sendBtn.style.opacity = "1";
+    micBtn.style.opacity = "1";
+
+    campoPergunta.disabled = false;
+}
+
+/* ==========================
+   SPEECH TO TEXT
+========================== */
+
+
+let ouvindo = false;
+
+if(SpeechRecognition){
+
+    const recognition = new SpeechRecognition();
+
+    recognition.lang = "pt-BR";
+
+    recognition.continuous = false;
+
+    recognition.interimResults = false;
+
+    /* clique microfone */
+    micBtn.addEventListener("click", () => {
+
+        /* evita iniciar duas vezes */
+        if(ouvindo) return;
+
+        ouvindo = true;
+
+        recognition.start();
+
+        micBtn.classList.add("listening");
+
+        loading.style.display = "block";
+
+        loading.innerHTML =
+            "🎤 Ouvindo...";
+
+        console.log("🎤 Ouvindo...");
+    });
+
+    /* quando detectar fala */
+    recognition.onresult = (event) => {
+
+        const texto =
+            event.results[0][0].transcript;
+
+        campoPergunta.value = texto;
+
+        console.log("Você disse:", texto);
+
+        /* envia automático */
+        form.requestSubmit();
+    };
+
+    /* quando parar */
+    recognition.onend = () => {
+
+        ouvindo = false;
+
+        micBtn.classList.remove("listening");
+
+        console.log("🔴 Parou de ouvir");
+    };
+
+    /* erro */
+    recognition.onerror = (event) => {
+
+        console.error(event.error);
+
+        ouvindo = false;
+
+        micBtn.classList.remove("listening");
+
+        loading.style.display = "none";
+    };
+
+}else{
+
+    console.warn(
+        "SpeechRecognition não suportado."
+    );
 }
