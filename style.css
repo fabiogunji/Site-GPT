@@ -228,9 +228,16 @@ input:checked+.slider:before {
     transform: translateX(30px);
 }
 
-.mic-btn.listening {
-    background: #ff4d4d;
-    animation: pulse 1s infinite;
+/* estado ouvindo */
+.mic-btn.listening{
+
+    background: #ff0000;
+
+    color: white;
+
+    animation: pulseMic 1.2s infinite;
+
+
 }
 
 @keyframes pulse {
@@ -243,6 +250,21 @@ input:checked+.slider:before {
     }
 
     100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes pulseMic{
+
+    0%{
+        transform: scale(1);
+    }
+
+    50%{
+        transform: scale(1.15);
+    }
+
+    100%{
         transform: scale(1);
     }
 }

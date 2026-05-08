@@ -195,6 +195,8 @@ form.addEventListener("submit", async function (e) {
         /* 🔊 fala resposta */
         falarTexto( limparMarkdown(textoFinal));
 
+        
+
     } catch (erro) {
 
         console.error(erro);
@@ -492,3 +494,187 @@ if(SpeechRecognition){
         "SpeechRecognition não suportado."
     );
 }
+
+/* ==========================
+   JARVIS VOICE SYSTEM
+========================== */
+
+
+const WAKE_WORD = "jarvis".toLowerCase();
+
+let recognition;
+
+let processando = false;
+
+
+/* ==========================
+   SPEECH API
+========================== */
+if(SpeechRecognition){
+
+    recognition =
+        new SpeechRecognition();
+
+    recognition.lang = "pt-BR";
+
+    recognition.continuous = true;
+
+    recognition.interimResults = false;
+
+    recognition.maxAlternatives = 1;
+
+    iniciarJarvis();
+
+}else{
+
+    console.error(
+        "SpeechRecognition não suportado"
+    );
+}
+
+/* ==========================
+   INICIAR ESCUTA
+========================== */
+function iniciarJarvis(){
+
+    if(ouvindo) return;
+
+    try{
+
+        recognition.start();
+
+        ouvindo = true;
+
+        micBtn.classList.add(
+            "listening"
+        );
+
+        console.log(
+            "🎧 JARVIS ouvindo..."
+        );
+
+    }catch(erro){
+
+        console.log(
+            "Microfone já iniciado"
+        );
+    }
+}
+
+/* ==========================
+   RESULTADO VOZ
+========================== */
+recognition.onresult =
+async (event) => {
+
+    if(processando) return;
+
+    let fala =
+    event.results[
+        event.results.length - 1
+    ][0].transcript
+    .toLowerCase()
+    .trim();
+
+    fala = fala.normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
+    console.log(
+        "🗣 Você disse:",
+        fala
+    );
+
+    /* remove pontuação */
+    fala = fala.replace(
+        /[.,!?]/g,
+        ""
+    );
+
+    /* verifica wake word */
+    if(!fala.includes(WAKE_WORD)){
+
+        return;
+    }
+
+    console.log(
+        "🟢 Wake word detectada"
+    );
+
+    processando = true;
+
+    /* remove jarvis */
+    const pergunta = fala
+        .replace(WAKE_WORD, "")
+        .trim();
+
+    if(pergunta.length === 0){
+
+        processando = false;
+
+        return;
+    }
+
+    /* coloca input */
+    campoPergunta.value =
+        pergunta;
+
+    /* loading */
+    loading.style.display =
+        "block";
+
+    loading.innerHTML =
+        "🤖 JARVIS processando...";
+
+    /* pesquisa */
+    await enviarPergunta();
+
+    processando = false;
+};
+
+/* ==========================
+   QUANDO ENCERRA
+========================== */
+recognition.onend = () => {
+
+    ouvindo = false;
+
+    micBtn.classList.remove(
+        "listening"
+    );
+
+    console.log(
+        "🔴 Microfone encerrado"
+    );
+
+    /* reinicia automático */
+    setTimeout(() => {
+
+        iniciarJarvis();
+
+    }, 1000);
+};
+
+/* ==========================
+   ERROS
+========================== */
+recognition.onerror = (event) => {
+
+    console.log(
+        "Erro Speech:",
+        event.error
+    );
+
+    ouvindo = false;
+
+    micBtn.classList.remove(
+        "listening"
+    );
+
+    /* reinicia */
+    setTimeout(() => {
+
+        iniciarJarvis();
+
+    }, 1500);
+};
+

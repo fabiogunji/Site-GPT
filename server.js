@@ -44,4 +44,3 @@ app.post("/perguntar", async (req, res) => {
         });        
     }
 });
-
